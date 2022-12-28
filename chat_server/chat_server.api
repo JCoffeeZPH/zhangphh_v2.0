@@ -1,0 +1,52 @@
+syntax = "v1"
+
+info (
+	author: "zhangphh"
+	email: "zhangphh@qq.com"
+)
+
+type sendMsgRequest {
+	MsgId          string `json:"msg_id"`
+	ConversationId string `json:"conversation_id"`
+	SendId         uint64 `json:"send_id"`
+	ReceiveId      uint64 `json:"receive_id"`
+	Content        string `json:"content"`
+}
+
+type sendMsgResponse {
+	MsgId string `json:"msg_id"`
+	Code  int32  `json:"code"`
+}
+
+type getConvRequest {
+	ConversationId string `json:"conversation_id"`
+}
+
+type getConvResponse {
+	Conversation conversation `json:"conversation"`
+	Code         int32        `json:"code"`
+}
+
+type conversation {
+	ConversationId string `json:"conversation_id"`
+	Users          []user `json:"users"`
+	TotalMsgCount  uint64 `json:"total_msg_count"`
+	Ctime          uint64 `json:"ctime"`
+}
+
+type user {
+	UserId string `json:"user_id"`
+	// todo add other fileds
+}
+
+@server (
+	middleware: AuthMiddleware
+)
+
+service chat_server-api {
+	@handler SendMsgHandler
+	post /message (sendMsgRequest) returns(sendMsgResponse)
+	
+	@handler GetConversationById
+	get /conversation/:conversation_id (getConvRequest) returns (getConvResponse)
+}
